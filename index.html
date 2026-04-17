@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Ana & Thomas — 22 Mai 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Great+Vibes&family=Cinzel:wght@400&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Cormorant Garamond',Georgia,serif;background:#FAF7F2;color:#222;min-height:100vh;overflow-x:hidden}
+
+header{text-align:center;padding:52px 20px 36px;background:#FDFAF5;border-bottom:1px solid #E8D9C0;position:relative;z-index:1}
+header .cinzel{font-family:'Cinzel',serif;font-size:10px;letter-spacing:6px;color:#111;margin-bottom:10px}
+header h1{font-family:'Great Vibes',cursive;font-size:clamp(72px,14vw,130px);color:#111;line-height:1.05;margin-bottom:4px}
+header .lieu{font-family:'Cinzel',serif;font-size:12px;letter-spacing:5px;color:#111;margin-bottom:8px}
+header .date{font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:#111;margin-bottom:16px}
+header .orn{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:16px}
+header .orn div{height:1px;width:50px;background:#111}
+header .welcome{font-family:'Cormorant Garamond',serif;font-size:20px;font-style:italic;color:#111}
+nav{display:flex;justify-content:center;gap:10px;padding:18px 16px;background:#FDFAF5;border-bottom:1px solid #E8D9C0;flex-wrap:wrap;position:relative;z-index:1}
+.btn-gold{background:#111;color:#FAF7F2;border:none;padding:11px 22px;font-family:'Cinzel',serif;font-size:10px;cursor:pointer;letter-spacing:2px;transition:background .2s}
+.btn-gold:hover{background:#333}
+.btn-ghost{background:transparent;color:#111;border:1px solid #111;padding:10px 20px;font-family:'Cinzel',serif;font-size:10px;cursor:pointer;letter-spacing:2px;transition:all .2s}
+.btn-ghost:hover{background:#111;color:#FAF7F2}
+.filters{display:flex;justify-content:center;gap:8px;padding:14px 16px;flex-wrap:wrap;position:relative;z-index:1}
+.filter-btn{background:transparent;border:1px solid #ccc;padding:7px 16px;font-family:'Cormorant Garamond',serif;font-size:14px;font-style:italic;cursor:pointer;color:#888;transition:all .2s}
+.filter-btn:hover,.filter-btn.active{border-color:#111;color:#111}
+.counter{text-align:center;padding:14px;font-style:italic;color:#aaa;font-size:14px;position:relative;z-index:1}
+.mosaic{columns:3 220px;gap:14px;padding:0 16px 60px;max-width:1100px;margin:0 auto;position:relative;z-index:1}
+.mosaic-item{break-inside:avoid;margin-bottom:14px;cursor:pointer;position:relative;overflow:hidden}
+.mosaic-item img{width:100%;display:block;transition:transform .4s ease}
+.mosaic-item:hover img{transform:scale(1.04)}
+.mosaic-overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.6));padding:14px 12px 10px;opacity:0;transition:opacity .3s}
+.mosaic-item:hover .mosaic-overlay{opacity:1}
+.m-moment{color:rgba(255,255,255,.6);font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;margin-bottom:4px}
+.m-name{color:#fff;font-family:'Cinzel',serif;font-size:11px;letter-spacing:1px;margin-bottom:3px}
+.m-msg{color:rgba(255,255,255,.75);font-size:13px;font-style:italic}
+.like-btn{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.92);border:none;border-radius:50%;width:36px;height:36px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:transform .2s;z-index:2}
+.like-btn:hover{transform:scale(1.2)}
+.like-count{position:absolute;top:10px;left:10px;background:rgba(255,255,255,.92);border-radius:20px;padding:3px 9px;font-size:12px;font-family:'Cormorant Garamond',serif;z-index:2;color:#333}
+.slideshow{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.96);z-index:1000;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.slideshow img{max-width:90vw;max-height:78vh;object-fit:contain}
+.slide-info{text-align:center;margin-top:16px;color:#fff}
+.slide-name{font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;margin-bottom:6px}
+.slide-msg{font-style:italic;font-size:16px;color:rgba(255,255,255,.65)}
+.slide-close{position:absolute;top:20px;right:24px;background:none;border:none;color:#fff;font-size:28px;cursor:pointer;opacity:.7}
+.slide-close:hover{opacity:1}
+.slide-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.12);border:none;color:#fff;font-size:32px;cursor:pointer;padding:14px 18px;transition:background .2s}
+.slide-nav:hover{background:rgba(255,255,255,.25)}
+.slide-prev{left:16px}.slide-next{right:16px}
+.slide-progress{position:absolute;bottom:24px;display:flex;gap:7px}
+.slide-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.35);cursor:pointer;transition:background .2s}
+.slide-dot.active{background:#fff}
+.upload-wrap{max-width:520px;margin:0 auto;padding:36px 20px 60px;position:relative;z-index:1}
+.form-head{text-align:center;margin-bottom:28px}
+.form-head .sup{font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;color:#111;margin-bottom:8px}
+.form-head h2{font-family:'Great Vibes',cursive;font-size:44px;color:#111;font-weight:400}
+.drop-zone{border:1.5px dashed #bbb;padding:40px 24px;text-align:center;cursor:pointer;background:#FDFAF5;margin-bottom:20px;transition:background .2s}
+.drop-zone:hover{background:#F0EBE0}
+.preview-wrap{position:relative;margin-bottom:20px}
+.preview-wrap img{width:100%;max-height:260px;object-fit:cover;display:block}
+.rm-btn{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:14px}
+.fields{display:flex;flex-direction:column;gap:14px}
+.field label{display:block;font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;color:#111;margin-bottom:6px}
+.field input,.field textarea{width:100%;padding:10px 13px;border:1px solid #D0C8B8;font-family:'Cormorant Garamond',serif;font-size:16px;background:#FDFAF5;color:#222;outline:none}
+.field input:focus,.field textarea:focus{border-color:#111}
+.moments-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.moment-opt{border:1px solid #D0C8B8;padding:10px;text-align:center;cursor:pointer;font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;color:#888;transition:all .2s}
+.moment-opt:hover,.moment-opt.selected{border-color:#111;color:#111;background:#F0EBE0}
+.err{color:#c0392b;font-size:14px;font-style:italic}
+.lightbox{max-width:700px;margin:0 auto;padding:32px 20px 60px;position:relative;z-index:1}
+.qr-wrap{max-width:480px;margin:0 auto;padding:36px 20px 60px;text-align:center;position:relative;z-index:1}
+.qr-box{background:#FDFAF5;border:1px solid #E8D9C0;padding:36px 24px;margin-top:24px}
+.spinner{text-align:center;padding:80px;font-style:italic;color:#aaa;font-size:16px;position:relative;z-index:1}
+.empty{text-align:center;padding:80px 20px;position:relative;z-index:1}
+.empty .o{font-size:28px;opacity:.25;margin-bottom:16px}
+.empty p{font-style:italic;color:#aaa;line-height:2;margin-bottom:28px;font-size:17px}
+@media(max-width:540px){.mosaic{columns:2 150px}}
+</style>
+</head>
+<body>
+<canvas id="petals" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0"></canvas>
+<header>
+  <p class="cinzel">✦ &nbsp; M A R I A G E &nbsp; ✦</p>
+  <h1>Ana &amp; Thomas</h1>
+  <p class="lieu">ESTAVAYER-LE-LAC &nbsp;·&nbsp; MORAT</p>
+  <p class="date">22 Mai 2026</p>
+  <div class="orn"><div></div><span>✦</span><div></div></div>
+  <p class="welcome">Capturez la magie de notre grand jour 📸</p>
+</header>
+<nav>
+  <button class="btn-gold" onclick="showView('gallery')">Galerie</button>
+  <button class="btn-gold" onclick="startSlideshow()">▶ Diaporama</button>
+  <button class="btn-gold" onclick="showView('upload')">+ Ajouter</button>
+  <button class="btn-ghost" onclick="showView('qr')">QR Code</button>
+</nav>
+<div id="app"></div>
+<div class="slideshow" id="slideshow" style="display:none">
+  <button class="slide-close" onclick="stopSlideshow()">✕</button>
+  <button class="slide-nav slide-prev" onclick="slidePrev()">‹</button>
+  <img id="slide-img" src="" alt=""/>
+  <div class="slide-info">
+    <p class="slide-name" id="slide-name"></p>
+    <p class="slide-msg" id="slide-msg"></p>
+  </div>
+  <button class="slide-nav slide-next" onclick="slideNext()">›</button>
+  <div class="slide-progress" id="slide-dots"></div>
+</div>
+<script>
+const SB_URL='https://djvkrvwrczcdknskwito.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRqdmtydndyY3pjZGtuc2t3aXRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNzIxNzcsImV4cCI6MjA5MTc0ODE3N30.DCfISAr0FT5MqXuFjC1A1m3PbhI4LzxTLJDWGm4VwPU';
+const db=window.supabase.createClient(SB_URL,SB_KEY);
+const MOMENTS=['Cérémonie','Cocktail','Repas','Soirée'];
+const QR='iVBORw0KGgoAAAANSUhEUgAAAZoAAAGaAQAAAAAefbjOAAAC70lEQVR4nO2cTY6jQAyFn4eSsixukKPAzUZzs6qj5AAtFctIoDcLu/jJrLozDengWkQJ8ClGWP555USIT6/86/MM4JBDDjnkkEMOvScktgKQ20mkByD9EOaXekF/iHkO7Q91JMliB5mGAOTrOF/WkCS5hfYzz6H9oUHmyHChSAsAmAT5ehcAgEaQo8xz6EAojmCKdwEGcwGm7/kmh34CxDQESF/TBNNw+Vex+GH35NBXoEhqKOg4At1NRKSdBB3vmk5Ijo/QfuY5tDeURUSktQ4DQEN0twul1xgxaatxlHkO7QdpqbAkBmopGe9CDFN1gbjNHC9+Tw79F2gS6QcRAA2RWwD5SgKx5orsvcYpIHvKuW8oiGNAV4DaZkyBwBSY248AxLK/eQ7tDsGUpzgCXWlolSWp75jiCO1IWU8wvfg9OfQMBGsy6zMnV25hXqJu0ZX54he/J4eegdYekQBYtFgUazRUZ0jRY8QZIPMIW0tQ4NoPEO2sx4j3hzYeURrasQLzDasySGDRMV/8nhx6BsLqma+qB45gQkNLEytF0z3izaGwvGUWABhaMLcfEGASAFNgdwujIBbI3uY5tDtUs0bB3Gtg+2KVZQ0jHiPeHLKsofWkVgomQOhZa0utjnCPOA8U7yK/OQJZLrW8pDUcIi3AhMl3uk4ArTRLsjRzk7mpLPWjZ41TQKusYdp1aWgCRGnmAoP1mHvEiSCdt0W8C7TNiHexicshaNaQ/jjzHNoHWpULKjtw1iPmGLEED48R7w+t9z7XQ/ib7S5d0VXs80BLUWljM3EEMFzIP20tMA40z6EDYoSuZp6UwGZfXDc8PGucCOpm4TIB0Kk6AHWWTnOK6xFngFaVZQ0FNTwsE/u6vI44J9QVQHoATIPIMiRB3i6U/mjzHPpuKDx8Zr6OgcuvPREJdAUUEyr2Nc+h3aGaNfggUtqQnYUH3QeDz0ecAHrsNXQDNG26Dus+XcU+BST+z2QOOeSQQw455NAXob9TEqsl7f19qAAAAABJRU5ErkJggg==';
+
+let photos=[],view='gallery',filter='Tous',slideIdx=0,slideTimer=null,selectedPhoto=null;
+let form={name:'',message:'',imageData:null,preview:null,table_name:'',moment:''};
+
+// Animation canvas — particules dorées & pétales blancs
+(function(){
+  const canvas=document.getElementById('petals');
+  const ctx=canvas.getContext('2d');
+  function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+  resize();
+  window.addEventListener('resize',resize);
+
+  const GOLD=['#C9A86C','#D4AF6A','#E8D5A3','#B8923E','#F0E0B0'];
+  const particles=[];
+
+  // Particules dorées scintillantes
+  for(let i=0;i<40;i++){
+    particles.push({
+      type:'dot',
+      x:Math.random()*window.innerWidth,
+      y:Math.random()*window.innerHeight,
+      r:0.8+Math.random()*2.5,
+      color:GOLD[Math.floor(Math.random()*GOLD.length)],
+      vy:-(0.2+Math.random()*0.5),
+      vx:(Math.random()-0.5)*0.4,
+      alpha:Math.random(),
+      alphaDir:Math.random()>0.5?0.005:-0.005,
+      phase:Math.random()*Math.PI*2
+    });
+  }
+
+  // Pétales blancs
+  for(let i=0;i<16;i++){
+    particles.push({
+      type:'petal',
+      x:Math.random()*window.innerWidth,
+      y:Math.random()*window.innerHeight,
+      w:8+Math.random()*10,
+      h:14+Math.random()*16,
+      rot:Math.random()*Math.PI*2,
+      rotV:(Math.random()-0.5)*0.015,
+      vy:-(0.3+Math.random()*0.6),
+      vx:Math.sin(Math.random()*Math.PI*2)*0.5,
+      alpha:0.25+Math.random()*0.45,
+      sway:Math.random()*Math.PI*2,
+      swaySpeed:0.01+Math.random()*0.015
+    });
+  }
+
+  function drawPetal(p){
+    ctx.save();
+    ctx.translate(p.x,p.y);
+    ctx.rotate(p.rot);
+    ctx.globalAlpha=p.alpha;
+    ctx.beginPath();
+    ctx.ellipse(0,0,p.w/2,p.h/2,0,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,0.85)';
+    ctx.fill();
+    // Nervure centrale
+    ctx.beginPath();
+    ctx.moveTo(0,-p.h/2);
+    ctx.lineTo(0,p.h/2);
+    ctx.strokeStyle='rgba(220,210,200,0.4)';
+    ctx.lineWidth=0.5;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function animate(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    const now=Date.now()/1000;
+    for(const p of particles){
+      if(p.type==='dot'){
+        p.alpha+=p.alphaDir;
+        if(p.alpha>=0.8||p.alpha<=0.05) p.alphaDir*=-1;
+        p.x+=p.vx+Math.sin(now+p.phase)*0.3;
+        p.y+=p.vy;
+        if(p.y<-10){p.y=canvas.height+10;p.x=Math.random()*canvas.width;}
+        ctx.save();
+        ctx.globalAlpha=p.alpha;
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fillStyle=p.color;
+        ctx.fill();
+        // Halo doré
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.r*2.5,0,Math.PI*2);
+        const g=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*2.5);
+        g.addColorStop(0,p.color.replace(')',',0.3)').replace('rgb','rgba'));
+        g.addColorStop(1,'transparent');
+        ctx.fillStyle=g;
+        ctx.fill();
+        ctx.restore();
+      } else {
+        p.sway+=p.swaySpeed;
+        p.x+=p.vx+Math.sin(p.sway)*0.6;
+        p.y+=p.vy;
+        p.rot+=p.rotV;
+        if(p.y<-30){p.y=canvas.height+30;p.x=Math.random()*canvas.width;}
+        drawPetal(p);
+      }
+    }
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+
+function compress(file){
+  return new Promise(res=>{
+    const r=new FileReader();
+    r.onload=e=>{
+      const img=new Image();
+      img.onload=()=>{
+        const c=document.createElement('canvas'),max=900;
+        let w=img.width,h=img.height;
+        if(w>max||h>max){if(w>h){h=Math.round(h*max/w);w=max;}else{w=Math.round(w*max/h);h=max;}}
+        c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);
+        res(c.toDataURL('image/jpeg',.72));
+      };
+      img.src=e.target.result;
+    };
+    r.readAsDataURL(file);
+  });
+}
+
+async function loadPhotos(){
+  document.getElementById('app').innerHTML='<div class="spinner">Chargement des souvenirs…</div>';
+  const{data,error}=await db.from('photos').select('*').order('created_at',{ascending:false});
+  if(!error)photos=data||[];
+  render();
+}
+
+function showView(v){view=v;render();if(v==='gallery')loadPhotos();}
+function fp(){return filter==='Tous'?photos:photos.filter(p=>p.moment===filter);}
+function setFilter(f){filter=f;render();}
+function openPhoto(i){selectedPhoto=photos[i];view='lightbox';render();}
+
+async function likePhoto(e,id){
+  e.stopPropagation();
+  const p=photos.find(x=>x.id===id);if(!p)return;
+  p.likes=(p.likes||0)+1;
+  await db.from('photos').update({likes:p.likes}).eq('id',id);
+  render();
+}
+
+async function handleFile(e){
+  const f=e.target.files[0];if(!f)return;
+  const d=await compress(f);form.imageData=d;form.preview=d;render();
+}
+function removePreview(){form.imageData=null;form.preview=null;render();}
+function selectMoment(m){form.moment=m;render();}
+
+async function handleSubmit(){
+  const name=document.getElementById('f-name').value.trim();
+  const message=document.getElementById('f-message').value.trim();
+  const table_name='';
+  if(!form.imageData||!name)return;
+  const btn=document.getElementById('submit-btn');
+  btn.disabled=true;btn.textContent='Envoi en cours…';
+  const{error}=await db.from('photos').insert({name,message,image_data:form.imageData,table_name,moment:form.moment,likes:0});
+  if(error){
+    document.getElementById('f-err').textContent='Erreur. Photo trop grande ?';
+    btn.disabled=false;btn.textContent='Partager ce souvenir';
+  }else{
+    form={name:'',message:'',imageData:null,preview:null,table_name:'',moment:''};
+    showView('gallery');
+  }
+}
+
+function startSlideshow(){
+  const f=fp();if(!f.length)return;
+  slideIdx=0;
+  document.getElementById('slideshow').style.display='flex';
+  updateSlide();
+  slideTimer=setInterval(()=>{slideIdx=(slideIdx+1)%f.length;updateSlide();},4000);
+}
+function stopSlideshow(){clearInterval(slideTimer);document.getElementById('slideshow').style.display='none';}
+function updateSlide(){
+  const f=fp(),p=f[slideIdx];
+  document.getElementById('slide-img').src=p.image_data;
+  document.getElementById('slide-name').textContent=p.name+(p.table_name?' · Table '+p.table_name:'');
+  document.getElementById('slide-msg').textContent=p.message?'"'+p.message+'"':'';
+  document.getElementById('slide-dots').innerHTML=f.map((_,i)=>`<div class="slide-dot${i===slideIdx?' active':''}" onclick="goSlide(${i})"></div>`).join('');
+}
+function slidePrev(){const f=fp();slideIdx=(slideIdx-1+f.length)%f.length;updateSlide();}
+function slideNext(){const f=fp();slideIdx=(slideIdx+1)%f.length;updateSlide();}
+function goSlide(i){slideIdx=i;updateSlide();}
+
+function downloadQR(){
+  const a=document.createElement('a');
+  a.download='qr-mariage-ana-thomas.png';
+  a.href='data:image/png;base64,'+QR;
+  a.click();
+}
+
+function render(){
+  const app=document.getElementById('app');
+  if(view==='gallery'){
+    const f=fp();
+    app.innerHTML=`
+      <div class="filters">
+        ${['Tous',...MOMENTS].map(m=>`<button class="filter-btn${filter===m?' active':''}" onclick="setFilter('${m}')">${m}</button>`).join('')}
+      </div>
+      <div class="counter">${photos.length} souvenir${photos.length!==1?'s':''} · ${f.length} affiché${f.length!==1?'s':''}</div>
+      ${f.length===0?`<div class="empty"><div class="o">✦</div><p>Aucune photo pour ce moment.<br/>Soyez les premiers à partager un souvenir !</p><button class="btn-gold" onclick="showView('upload')">Partager une photo</button></div>`:`
+      <div class="mosaic">${f.map(p=>`
+        <div class="mosaic-item" onclick="openPhoto(${photos.indexOf(p)})">
+          <img src="${p.image_data}" alt=""/>
+          <button class="like-btn" onclick="likePhoto(event,'${p.id}')">♥</button>
+          ${(p.likes||0)>0?`<div class="like-count">♥ ${p.likes}</div>`:''}
+          <div class="mosaic-overlay">
+            ${p.moment?`<p class="m-moment">${p.moment}</p>`:''}
+            <p class="m-name">${p.name}</p>
+            ${p.message?`<p class="m-msg">"${p.message}"</p>`:''}
+          </div>
+        </div>`).join('')}
+      </div>`}`;
+  }
+  if(view==='upload'){
+    app.innerHTML=`
+      <div class="upload-wrap">
+        <button class="btn-ghost" onclick="showView('gallery')" style="margin-bottom:28px">← Retour</button>
+        <div class="form-head"><p class="sup">✦ votre souvenir ✦</p><h2>Partager une photo</h2></div>
+        ${!form.preview?`
+          <div class="drop-zone" onclick="document.getElementById('fi').click()">
+            <div style="font-size:22px;opacity:.35;margin-bottom:10px">✦</div>
+            <p style="font-size:16px;margin-bottom:4px">Cliquez pour choisir une photo</p>
+            <small style="color:#aaa;font-size:13px">JPG, PNG</small>
+            <input id="fi" type="file" accept="image/*" style="display:none" onchange="handleFile(event)"/>
+          </div>`:`
+          <div class="preview-wrap">
+            <img src="${form.preview}" alt=""/>
+            <button class="rm-btn" onclick="removePreview()">✕</button>
+          </div>`}
+        <div class="fields">
+          <div class="field"><label>Votre nom *</label><input id="f-name" placeholder="Ex : Marie &amp; Pierre"/></div>
+
+          <div class="field"><label>Moment de la journée</label>
+            <div class="moments-grid">${MOMENTS.map(m=>`<div class="moment-opt${form.moment===m?' selected':''}" onclick="selectMoment('${m}')">${m}</div>`).join('')}</div>
+          </div>
+          <div class="field"><label>Un petit mot</label><textarea id="f-message" rows="3" placeholder="Un souvenir, un vœu…"></textarea></div>
+          <p id="f-err" class="err"></p>
+          <button id="submit-btn" class="btn-gold" onclick="handleSubmit()" ${!form.imageData?'disabled':''} style="padding:14px;font-size:11px;letter-spacing:3px;margin-top:6px">Partager ce souvenir</button>
+        </div>
+      </div>`;
+  }
+  if(view==='lightbox'&&selectedPhoto){
+    const p=selectedPhoto;
+    app.innerHTML=`
+      <div class="lightbox">
+        <button class="btn-ghost" onclick="showView('gallery')" style="margin-bottom:24px">← Retour</button>
+        <img src="${p.image_data}" style="width:100%;max-height:62vh;object-fit:contain;display:block"/>
+        <div style="text-align:center;margin-top:20px;padding:20px 0 0;border-top:1px solid #E8D9C0">
+          ${p.moment?`<p style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;color:#aaa;margin-bottom:8px">${p.moment}</p>`:''}
+          <p style="font-family:'Cinzel',serif;font-size:12px;letter-spacing:1px;margin-bottom:6px">${p.name}</p>
+          ${p.message?`<p style="font-style:italic;color:#888;font-size:17px;line-height:1.8">"${p.message}"</p>`:''}
+          <button onclick="likePhoto(event,'${p.id}')" style="margin-top:16px;background:none;border:1px solid #ddd;padding:8px 22px;font-family:'Cormorant Garamond',serif;font-size:16px;cursor:pointer;color:#888;transition:all .2s">♥ ${p.likes||0} j'aime</button>
+        </div>
+      </div>`;
+  }
+  if(view==='qr'){
+    app.innerHTML=`
+      <div class="qr-wrap">
+        <button class="btn-ghost" onclick="showView('gallery')" style="margin-bottom:28px">← Retour</button>
+        <div class="form-head"><p class="sup">✦ partagez l'app ✦</p><h2>QR Code invités</h2></div>
+        <div class="qr-box">
+          <img src="data:image/png;base64,${QR}" style="width:250px;height:250px;display:block;margin:0 auto 20px"/>
+          <p style="font-style:italic;color:#aaa;font-size:14px;margin-bottom:16px">ana-et-thomas.netlify.app</p>
+          <p style="font-style:italic;color:#888;font-size:15px;line-height:1.9;margin-bottom:22px">Imprimez ce QR code et placez-le sur les tables.<br/>Vos invités le scannent et accèdent directement à la galerie.</p>
+          <button class="btn-gold" onclick="downloadQR()" style="padding:12px 28px">Télécharger le QR code</button>
+        </div>
+      </div>`;
+  }
+}
+
+loadPhotos();
+</script>
+</body>
+</html>
